@@ -59,6 +59,7 @@ def complete(request, provider):
     if request.user.is_authenticated():
         success = backend.login_user(request)
         backend.merge_accounts(request)
+        return redirect(request.META.get('HTTP_REFERER', '/'))
     else:
         success = backend.login_user(request)
         if not success and not settings.REGISTRATION_ALLOWED:
