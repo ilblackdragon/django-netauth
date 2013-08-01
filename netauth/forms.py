@@ -12,7 +12,7 @@ from netauth.models import NetID
 
 class ExtraForm(forms.Form):
 
-    username = forms.CharField(min_length=3, max_length=25, label="Display Name")
+    username = forms.CharField(min_length=3, max_length=25, label=_("Username"))
 
     def clean_username(self):
         try:

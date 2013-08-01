@@ -15,6 +15,7 @@ Requirements
 - django >= 1.2
 - python-openid
 - oauth2
+- django-misc
 
 
 Installation
@@ -24,13 +25,17 @@ Installation
 
     pip install django-netauth
 
+Refer to https://github.com/ilblackdragon/django-misc for detailed instruction about installation and setup of django-misc
 
 Setup
 ======
 
 - Add 'netauth' to INSTALLED_APPS ::
 
-    INSTALLED_APPS += ( 'netauth', )
+    INSTALLED_APPS += ( 
+        'misc',
+        'netauth', 
+    )
 
 
 - Add netauth urls to base urls ::

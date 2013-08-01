@@ -1,16 +1,23 @@
+from django.conf import settings
 from django.contrib import messages, auth
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import render_to_response, redirect
+
+if 'coffin' in settings.INSTALLED_APPS:
+    from coffin.shortcuts import render_to_response
+else:
+    from django.shortcuts import render_to_response
+
+from django.shortcuts import redirect
 from django.template import RequestContext
 
-from netauth import settings, lang
+from netauth import settings as netauth_settings, lang
 from netauth.utils import str_to_class, get_backend
 
 
 def logout(request):
     auth.logout(request)
     messages.success(request, lang.SUCCESS_LOGOUT)
-    return redirect(settings.LOGOUT_URL)
+    return redirect(netauth_settings.LOGOUT_URL)
 
 
 def begin(request, provider):
@@ -20,7 +27,7 @@ def begin(request, provider):
         function below.
     """
     # store url to where user will be redirected
-    request.session['next_url'] = request.GET.get("next") or settings.LOGIN_REDIRECT_URL
+    request.session['next_url'] = request.GET.get("next") or netauth_settings.LOGIN_REDIRECT_URL
 
     # start the authentication process
     backend = get_backend(provider)
@@ -50,7 +57,7 @@ def complete(request, provider):
 
     # In case of skipping begin step.
     if 'next_url' not in request.session:
-        request.session['next_url'] = request.GET.get("next") or settings.LOGIN_REDIRECT_URL
+        request.session['next_url'] = request.GET.get("next") or netauth_settings.LOGIN_REDIRECT_URL
 
     backend = get_backend(provider)
     response = backend.validate(request, data)
@@ -63,11 +70,11 @@ def complete(request, provider):
         return redirect(request.META.get('HTTP_REFERER', '/'))
     else:
         success = backend.login_user(request)
-        if not success and not settings.REGISTRATION_ALLOWED:
+        if not success and not netauth_settings.REGISTRATION_ALLOWED:
             messages.warning(request, lang.REGISTRATION_DISABLED)
-            return redirect(settings.REGISTRATION_DISABLED_REDIRECT)
+            return redirect(netauth_settings.REGISTRATION_DISABLED_REDIRECT)
     if success:
-        return redirect(request.session.pop('next_url', settings.LOGIN_REDIRECT_URL))
+        return redirect(request.session.pop('next_url', netauth_settings.LOGIN_REDIRECT_URL))
     return backend.complete(request, response)
 
 def extra(request, provider):
@@ -79,20 +86,20 @@ def extra(request, provider):
         raise Http404
 
     if request.method == "POST":
-        form = str_to_class(settings.EXTRA_FORM)(request.POST)
+        form = str_to_class(netauth_settings.EXTRA_FORM)(request.POST)
         if form.is_valid():
             user = form.save(request, identity, provider)
             del request.session['identity']
-            if not settings.ACTIVATION_REQUIRED:
+            if not netauth_settings.ACTIVATION_REQUIRED:
                 user = auth.authenticate(identity=identity, provider=provider)
                 if user:
                     auth.login(request, user)
-                    return redirect(request.session.pop('next_url', settings.LOGIN_REDIRECT_URL))
+                    return redirect(request.session.pop('next_url', netauth_settings.LOGIN_REDIRECT_URL))
             else:
                 messages.warning(request, lang.ACTIVATION_REQUIRED_TEXT)
-                return redirect(settings.ACTIVATION_REDIRECT_URL)
+                return redirect(netauth_settings.ACTIVATION_REDIRECT_URL)
     else:
         initial = request.session['extra']
-        form = str_to_class(settings.EXTRA_FORM)(initial=initial)
+        form = str_to_class(netauth_settings.EXTRA_FORM)(initial=initial)
 
     return render_to_response('netauth/extra.html', {'form': form }, context_instance=RequestContext(request))
