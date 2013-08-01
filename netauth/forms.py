@@ -1,10 +1,14 @@
 from django import forms
 from django.utils.translation import ugettext as _
-from django.contrib.auth.models import User
+
+try:
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+except ImportError:
+    from django.contrib.auth.models import User
 
 from netauth.models import NetID
 from netauth import settings
-
 
 class ExtraForm(forms.Form):
 
@@ -18,7 +22,7 @@ class ExtraForm(forms.Form):
             return self.cleaned_data['username']
 
     def save(self, request, identity, provider):
-        user = User.objects.create(username=self.cleaned_data['username'])
+        user = User.objects.create(username=self.cleaned_data['username'], password=settings.UNUSABLE_PASSWORD)
         if settings.ACTIVATION_REQUIRED:
             user.is_active = False
         user.save()

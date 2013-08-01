@@ -81,3 +81,4 @@ VKONTAKTE_PROFILE_MAPPING = getattr(settings, "VKONTAKTE_PROFILE_MAPPING", {
 
 SESSION_MAX_AGE = getattr(settings, "SESSION_MAX_AGE", 60 * 60 * 24 * 7 * 2)
 
+UNUSABLE_PASSWORD = getattr(settings, 'NETAUTH_UNUSABLE_PASSWORD', '!')
