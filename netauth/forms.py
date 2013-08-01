@@ -7,8 +7,8 @@ try:
 except ImportError:
     from django.contrib.auth.models import User
 
-from netauth.models import NetID
 from netauth import settings
+from netauth.models import NetID
 
 class ExtraForm(forms.Form):
 
@@ -26,6 +26,6 @@ class ExtraForm(forms.Form):
         if settings.ACTIVATION_REQUIRED:
             user.is_active = False
         user.save()
-        NetID.objects.create(user=user, identity=identity, provider=provider)
+        NetID.objects.get_or_create(identity=identity, provider=provider, defaults={'user': user})
         return user
 
