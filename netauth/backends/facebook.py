@@ -34,7 +34,10 @@ class FacebookBackend(OAuthBaseBackend):
             'code': data['code'],
         })
         content = self.load_request(request)
-        access_token = self.parse_qs(content)['access_token'][0]
+        try:
+            access_token = self.parse_qs(content)['access_token'][0]
+        except Exception as e:
+            return self.error(request)
 
         # Get user info
         request = self.get_request( url=self.API_URL, parameters = { 'access_token': access_token })
