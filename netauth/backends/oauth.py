@@ -1,6 +1,7 @@
+import json
+
 from django.conf import settings as global_settings
 from django.shortcuts import redirect
-from django.utils import simplejson
 from oauth2 import Consumer, Token, Request, SignatureMethod_HMAC_SHA1
 
 from netauth.backends import OAuthBaseBackend
@@ -44,7 +45,7 @@ class OAuthBackend(OAuthBaseBackend):
         user_id = self.parse_qs(response)['user_id'][0]
         request = super( OAuthBackend, self ).get_request( self.API_URL % user_id )
         content = self.load_request(request)
-        return simplejson.loads(content)
+        return json.loads(content)
 
     def get_request( self, token=None, http_url=None, parameters=dict() ):
         request = Request.from_consumer_and_token( self.consumer, token = token,

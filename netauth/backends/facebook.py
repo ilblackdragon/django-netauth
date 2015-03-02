@@ -1,5 +1,6 @@
+import json
+
 from django.shortcuts import redirect
-from django.utils import simplejson
 
 from netauth import settings
 from netauth.backends import OAuthBaseBackend
@@ -41,7 +42,7 @@ class FacebookBackend(OAuthBaseBackend):
 
         # Get user info
         request = self.get_request( url=self.API_URL, parameters = { 'access_token': access_token })
-        extra = simplejson.loads(self.load_request(request))
+        extra = json.loads(self.load_request(request))
         try:
             self.identity = extra['id']
         except KeyError:
